@@ -21,7 +21,7 @@ def lista_electores():
         print(f'Fallo la conexión: {ex}')
 
 
-@routers.get('/{id}')        
+@routers.get('/id/{id}')        
 def obtener_elector(id: int):
     try:
         with conexion_bd() as conexion:
@@ -39,3 +39,23 @@ def obtener_elector(id: int):
             return dict(row)
     except Exception as ex:
         print(f'Fallo la conexion: {ex}')
+        
+@routers.get('/cedula/{cedula}')
+def buscar_cedula(cedula: str):
+    try:
+        with conexion_bd() as conexion:
+            sql:str = '''
+            SELECT *
+            FROM electores
+            WHERE cedula = ?
+            '''
+            cursor = conexion.execute(sql,(cedula,))
+            row = cursor.fetchone()
+            
+            if not row:
+                 raise HTTPException(status_code=500, detail='Error interno del servidor')
+             
+            return dict (row)
+    except Exception as ex:
+        print(f'Falló la conexion: {ex}')
+       
