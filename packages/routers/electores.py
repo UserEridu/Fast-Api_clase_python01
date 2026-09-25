@@ -5,17 +5,21 @@ from ..schemas import ElectorBase
 routers = APIRouter(prefix='/electores', tags=['Electores'])
 
 @routers.get('')
-def lista_electores():
+def lista_electores(page: int = Query(1, ge=1)):
     try:
        with conexion_bd() as conexion:
+        page_size: int = 20
+        offset: int = (page -1) * page_size
         sql: str = '''
         SELECT *
         FROM  electores
         ORDER BY id
-        LIMIT 20
+        LIMIT ?
+        OFFSET ?
         '''
-        cursor = conexion.execute(sql)
+        cursor = conexion.execute(sql,(page_size, offset))
         rows = cursor.fetchall()
+        
         return [dict(row) for row in rows]
     except Exception as ex:
         print(f'Fallo la conexión: {ex}')
